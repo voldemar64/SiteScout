@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 import User from '../models/user.js';
 import ValidationError from '../errors/ValidationError.js';
 import NotFound from '../errors/NotFound.js';
@@ -21,6 +23,42 @@ const login = async (req, res, next) => {
         next(err);
     }
 };
+
+const resetPassword = async (req, res, next) => {
+    try {
+        const { email, password, code } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new NotFound('Пользователь с указанным email не найден.');
+        }
+
+        if (user.resetCode !== code) {
+            throw new ValidationError('Неверный код подтверждения.');
+        }
+
+        const hash = await bcrypt.hash(password, 10);
+
+        user.password = hash;
+        user.resetCode = null;
+        res.status(201).send({
+            email: user.email,
+            name: user.name,
+            surname: user.surname,
+            phone: user.phone,
+            _id: user._id,
+        });
+    } catch (err) {
+        if (err.name === 'ValidationError' || err.name === 'CastError') {
+            next(new ValidationError('Переданы некорректные данные при обновлении пароля.'));
+        } else if (err.code === 11000) {
+            next(new ConflictError('Введите другой email.'));
+        } else {
+            next(err);
+        }
+    }
+};
+
 
 const getUsers = async (req, res, next) => {
     try {
@@ -130,6 +168,7 @@ const patchUser = async (req, res, next) => {
 
 export default {
     login,
+    resetPassword,
     getUsers,
     getCurrentUser,
     getUser,

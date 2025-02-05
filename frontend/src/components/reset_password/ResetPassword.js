@@ -41,8 +41,6 @@ function ResetPassword({ submit, loggedIn }) {
 
     function handleSendCode() {
         if (values.email && !errors.email) {
-            console.log("Отправка кода на email:", values.email);
-
             setIsCodeSent(true);
             setIsCountingDown(true);
             setTimer(59);
@@ -100,7 +98,6 @@ function ResetPassword({ submit, loggedIn }) {
                                 type="text"
                                 className="register__input"
                                 onChange={handleChange}
-                                disabled={!isCodeSent}
                             />
                             {errors.code && (
                                 <span className="register__error">{errors.code}</span>

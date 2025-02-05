@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import AuthError from '../errors/AuthError.js';
 
 const phoneExpression = /^\+7\d{10}$/;
+const codeExpression = /^\d{6}$/;
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -39,6 +40,14 @@ const userSchema = new mongoose.Schema({
             message: 'Неверный формат телефона. Используйте формат +7**********',
         },
     },
+    resetCode: {
+        type: String,
+        select: false,
+        validate: {
+            validator: (code) => codeExpression.test(code),
+            message: 'Код должен содержать ровно 6 цифр.',
+        },
+    },
 });
 
 userSchema.statics.findUserByCredentials = async function (email, password) {
@@ -50,6 +59,7 @@ userSchema.statics.findUserByCredentials = async function (email, password) {
     if (!matched) {
         throw new AuthError('Неправильные почта или пароль');
     }
+
     return user;
 };
 

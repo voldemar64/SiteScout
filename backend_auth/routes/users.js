@@ -8,6 +8,7 @@ const {
     getUsers,
     getCurrentUser,
     getUser,
+    resetPassword,
     patchUser,
 } = usersController;
 
@@ -19,6 +20,7 @@ const {
 router.get('/', getUsers);
 router.get('/me', getUser);
 router.get('/:id', currentUserValidation, getCurrentUser);
+router.post('/reset-password', resetPassword);
 router.patch('/me', userValidation, patchUser);
 
 export default router;

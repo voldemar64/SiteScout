@@ -27,6 +27,7 @@ app.use(requestLogger);
 // Public routes
 app.post('/signup', signupValidation, createUser);
 app.post('/signin', signinValidation, login);
+app.post('/reset-password', resetPasswordValidation, resetPassword);
 
 // Protected routes
 app.use(auth);

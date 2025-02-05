@@ -1,6 +1,7 @@
 import { Joi, celebrate } from 'celebrate';
 
 const phoneExpression = /^\+7\d{10}$/;
+const codeExpression = /^\d{6}$/;
 
 // Общие схемы для повторного использования
 const emailSchema = Joi.string().required().email();
@@ -25,6 +26,14 @@ const signupValidation = celebrate({
     }),
 });
 
+const resetPasswordValidation = celebrate({
+    body: Joi.object().keys({
+        email: emailSchema,
+        password: Joi.string().required(),
+        code: Joi.string().pattern(codeExpression).required(),
+    })
+})
+
 const currentUserValidation = celebrate({
     params: Joi.object().keys({
         id: Joi.string().required().hex().length(24),
@@ -43,6 +52,7 @@ const userValidation = celebrate({
 export default {
     signinValidation,
     signupValidation,
+    resetPasswordValidation,
     currentUserValidation,
     userValidation,
 };
