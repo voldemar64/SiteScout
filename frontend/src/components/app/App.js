@@ -6,6 +6,7 @@ import Main from "../main_landing/main/Main";
 import Footer from "../footer/Footer";
 import Login from "../login/Login";
 import Register from "../register/Register";
+import ResetPassword from "../reset_password/ResetPassword";
 import Profile from "../profile/Profile";
 import NotFound from "../not_found/NotFound";
 import InfoTooltip from "../infotooltip/InfoTooltip";
@@ -99,6 +100,28 @@ function App() {
       });
   }
 
+
+  function handleResetPassword(email, password, code) {
+    auth
+        .resetPassword(email, password, code)
+        .then((res) => {
+          if (res) {
+            localStorage.setItem("jwt", res.token);
+            setLoggedIn(true);
+            navigate("/");
+          } else {
+            setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
+            setPopupPhoto(cross);
+            setIsInfoTooltipOpen(true);
+          }
+        })
+        .catch(() => {
+          setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
+          setPopupPhoto(cross);
+          setIsInfoTooltipOpen(true);
+        });
+  }
+
   function handleSignOut() {
     setTokenChecked(false);
     setLoggedIn(false);
@@ -152,6 +175,10 @@ function App() {
           <Route
             path="/signin"
             element={<Login submit={handleLogin} loggedIn={loggedIn} />}
+          />
+          <Route
+            path="/reset-password"
+            element={<ResetPassword submit={handleResetPassword} loggedIn={loggedIn} />}
           />
           <Route
             path="/signup"

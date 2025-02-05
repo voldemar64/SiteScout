@@ -30,7 +30,7 @@ function Footer() {
             className="footer__link"
             rel="noreferrer"
             target="_blank"
-            href="https://github.com/voldemar64"
+            href="https://github.com/voldemar64/SiteScout"
           >
             Github
           </a>

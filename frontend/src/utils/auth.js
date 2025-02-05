@@ -32,6 +32,19 @@ export function authorize(email, password) {
     .catch((err) => console.log(`не удалось авторизоваться: ${err}`));
 }
 
+export function resetPassword(email, code, password) {
+  return fetch(`${BASE_URL}/reset-password`, {
+    method: "PATCH",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({password: password, email: email, code: code}),
+  })
+    .then(handleRes)
+    .catch((err) => console.log(`не удалось сменить пароль: ${err}`))
+}
+
 export function checkToken(token) {
   return fetch(`${BASE_URL}/users/me`, {
     method: "GET",

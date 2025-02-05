@@ -65,6 +65,11 @@ function Login({ submit, loggedIn }) {
           Регистрация
         </Link>
       </p>
+      <p className="register__text">
+        <Link to="/reset-password" className="register__link register__link_type_password">
+          Забыли пароль?
+        </Link>
+      </p>
     </section>
   ) : (
     <Navigate to="/" />

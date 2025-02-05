@@ -11,7 +11,7 @@
     "format": "prettier --write .."
   },
   "keywords": [],
-  "author": "Voldemar, Vladislav",
+  "author": "Voldemar",
   "license": "ISC",
   "description": "SiteScout - million dollar profit project",
   "dependencies": {
