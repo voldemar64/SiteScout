@@ -26,6 +26,12 @@ const signupValidation = celebrate({
     }),
 });
 
+const sendCodeValidation = celebrate({
+    body: Joi.object().keys({
+        email: emailSchema,
+    }),
+});
+
 const resetPasswordValidation = celebrate({
     body: Joi.object().keys({
         email: emailSchema,
@@ -52,6 +58,7 @@ const userValidation = celebrate({
 export default {
     signinValidation,
     signupValidation,
+    sendCodeValidation,
     resetPasswordValidation,
     currentUserValidation,
     userValidation,

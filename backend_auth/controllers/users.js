@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
-import crypto from 'crypto';
 import User from '../models/user.js';
 import ValidationError from '../errors/ValidationError.js';
 import NotFound from '../errors/NotFound.js';
@@ -24,23 +23,72 @@ const login = async (req, res, next) => {
     }
 };
 
-const resetPassword = async (req, res, next) => {
+const sendCode = async (req, res, next) => {
     try {
-        const { email, password, code } = req.body;
+        const { email } = req.body;
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            throw new ValidationError('Некорректный email.');
+        }
 
         const user = await User.findOne({ email });
+
         if (!user) {
             throw new NotFound('Пользователь с указанным email не найден.');
         }
 
-        if (user.resetCode !== code) {
-            throw new ValidationError('Неверный код подтверждения.');
+        const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const expirationTime = new Date(Date.now() + 10 * 60 * 1000);
+
+        user.resetCode = resetCode;
+        user.resetCodeExpires = expirationTime;
+        await user.save();
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Сброс пароля',
+            text: `Ваш код для сброса пароля: ${resetCode}. Он действителен в течение 5 минут.`,
+        });
+
+        res.status(200).send({
+            email: user.email,
+            name: user.name,
+            surname: user.surname,
+            phone: user.phone,
+            _id: user._id,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const resetPassword = async (req, res, next) => {
+    try {
+        const { email, password, code } = req.body;
+
+        const user = await User.findOne({ email }).select('+resetCode +resetCodeExpires');
+        if (!user) {
+            throw new NotFound('Пользователь с указанным email не найден.');
         }
 
-        const hash = await bcrypt.hash(password, 10);
+        if (user.resetCode !== code || Date.now() > user.resetCodeExpires) {
+            throw new ValidationError('Неверный или истекший код подтверждения.');
+        }
 
-        user.password = hash;
+        user.password = await bcrypt.hash(password, 10);
         user.resetCode = null;
+        user.resetCodeExpires = null;
+        await user.save();
+
         res.status(201).send({
             email: user.email,
             name: user.name,
@@ -50,7 +98,7 @@ const resetPassword = async (req, res, next) => {
         });
     } catch (err) {
         if (err.name === 'ValidationError' || err.name === 'CastError') {
-            next(new ValidationError('Переданы некорректные данные при обновлении пароля.'));
+            next(new ValidationError(err.message));
         } else if (err.code === 11000) {
             next(new ConflictError('Введите другой email.'));
         } else {
@@ -168,6 +216,7 @@ const patchUser = async (req, res, next) => {
 
 export default {
     login,
+    sendCode,
     resetPassword,
     getUsers,
     getCurrentUser,

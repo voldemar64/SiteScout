@@ -8,6 +8,7 @@ const {
     getUsers,
     getCurrentUser,
     getUser,
+    sendCode,
     resetPassword,
     patchUser,
 } = usersController;
@@ -15,12 +16,15 @@ const {
 const {
     currentUserValidation,
     userValidation,
+    sendCodeValidation,
+    resetPasswordValidation,
 } = validation;
 
 router.get('/', getUsers);
 router.get('/me', getUser);
 router.get('/:id', currentUserValidation, getCurrentUser);
-router.post('/reset-password', resetPassword);
+router.post('/send-code', sendCodeValidation, sendCode);
+router.post('/reset-password', resetPasswordValidation, resetPassword);
 router.patch('/me', userValidation, patchUser);
 
 export default router;

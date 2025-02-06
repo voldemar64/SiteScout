@@ -44,9 +44,15 @@ const userSchema = new mongoose.Schema({
         type: String,
         select: false,
         validate: {
-            validator: (code) => codeExpression.test(code),
+            validator: (code) => {
+                return code === null || codeExpression.test(code);
+            },
             message: 'Код должен содержать ровно 6 цифр.',
         },
+    },
+    resetCodeExpires: {
+        type: Date,
+        select: false,
     },
 });
 

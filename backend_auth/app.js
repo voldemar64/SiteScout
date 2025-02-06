@@ -15,8 +15,8 @@ const { PORT = 5000 } = process.env;
 const app = express();
 
 const { requestLogger, errorLogger } = logger;
-const { login, createUser } = usersController;
-const { signinValidation, signupValidation } = validation;
+const { login, createUser, resetPassword, sendCode } = usersController;
+const { signinValidation, signupValidation} = validation;
 
 // Middleware
 app.use(express.json());
@@ -27,7 +27,9 @@ app.use(requestLogger);
 // Public routes
 app.post('/signup', signupValidation, createUser);
 app.post('/signin', signinValidation, login);
-app.post('/reset-password', resetPasswordValidation, resetPassword);
+app.post('/send-code', sendCode);
+app.post('/reset-password', resetPassword);
+
 
 // Protected routes
 app.use(auth);

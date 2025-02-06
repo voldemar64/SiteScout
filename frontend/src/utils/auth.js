@@ -32,14 +32,27 @@ export function authorize(email, password) {
     .catch((err) => console.log(`не удалось авторизоваться: ${err}`));
 }
 
-export function resetPassword(email, code, password) {
-  return fetch(`${BASE_URL}/reset-password`, {
-    method: "PATCH",
+export function sendCode(email) {
+  return fetch(`${BASE_URL}/send-code`, {
+    method: "POST",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({password: password, email: email, code: code}),
+    body: JSON.stringify({ email: email }),
+  })
+      .then(handleRes)
+      .catch((err) => console.log(`не удалось подтвердить почту: ${err}`))
+}
+
+export function resetPassword(email, password, code) {
+  return fetch(`${BASE_URL}/reset-password`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ password: password, email: email, code: code }),
   })
     .then(handleRes)
     .catch((err) => console.log(`не удалось сменить пароль: ${err}`))

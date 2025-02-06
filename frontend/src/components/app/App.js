@@ -88,38 +88,57 @@ function App() {
           setLoggedIn(true);
           navigate("/");
         } else {
-          setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
+          setPopupTitle("Что-то пошло не так!:(");
           setPopupPhoto(cross);
           setIsInfoTooltipOpen(true);
         }
       })
       .catch(() => {
-        setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
+        setPopupTitle("Что-то пошло не так!:(");
         setPopupPhoto(cross);
         setIsInfoTooltipOpen(true);
       });
   }
 
+  function sendCode(email) {
+    auth
+      .sendCode(email)
+        .then((res) => {
+          if (res) {
+            setPopupTitle("Верный код!");
+            setPopupPhoto(tick);
+          } else {
+            setPopupTitle("Код неверный!:(");
+            setPopupPhoto(cross);
+          }
+        })
+        .catch(() => {
+          setPopupTitle("Что-то пошло не так!:(");
+          setPopupPhoto(cross);
+        })
+        .finally(setIsInfoTooltipOpen(true));
+  }
 
   function handleResetPassword(email, password, code) {
     auth
         .resetPassword(email, password, code)
         .then((res) => {
           if (res) {
-            localStorage.setItem("jwt", res.token);
-            setLoggedIn(true);
-            navigate("/");
+            setPopupTitle("Пароль изменён!");
+            setPopupPhoto(tick);
+            navigate("/signin");
           } else {
-            setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
+            setPopupTitle("Что-то пошло не так!:(");
             setPopupPhoto(cross);
             setIsInfoTooltipOpen(true);
           }
         })
         .catch(() => {
-          setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
+          setPopupTitle("Что-то пошло не так!:(");
           setPopupPhoto(cross);
           setIsInfoTooltipOpen(true);
-        });
+        })
+        .finally(setIsInfoTooltipOpen(true));
   }
 
   function handleSignOut() {
@@ -178,7 +197,7 @@ function App() {
           />
           <Route
             path="/reset-password"
-            element={<ResetPassword submit={handleResetPassword} loggedIn={loggedIn} />}
+            element={<ResetPassword submit={handleResetPassword} sendCode={sendCode} loggedIn={loggedIn} />}
           />
           <Route
             path="/signup"

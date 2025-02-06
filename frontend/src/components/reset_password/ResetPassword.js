@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useFormWithValidation } from "../../utils/formValidator";
 
-function ResetPassword({ submit, loggedIn }) {
+function ResetPassword({ submit, sendCode, loggedIn }) {
     const [isCodeSent, setIsCodeSent] = useState(false);
     const [timer, setTimer] = useState(60);
     const [isCountingDown, setIsCountingDown] = useState(false);
@@ -34,6 +34,8 @@ function ResetPassword({ submit, loggedIn }) {
 
     function handleSubmit(e) {
         e.preventDefault();
+        console.log("Тип данных кода:", typeof values.code, values.code);
+
         if (isValid) {
             submit(values.email, values.password, values.code);
         }
@@ -41,6 +43,7 @@ function ResetPassword({ submit, loggedIn }) {
 
     function handleSendCode() {
         if (values.email && !errors.email) {
+            sendCode(values.email);
             setIsCodeSent(true);
             setIsCountingDown(true);
             setTimer(59);
